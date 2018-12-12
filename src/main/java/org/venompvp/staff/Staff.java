@@ -1,0 +1,152 @@
+package org.venompvp.staff;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.venompvp.staff.commands.FreezeCommand;
+import org.venompvp.staff.commands.ReportCommand;
+import org.venompvp.staff.commands.StaffChatCommand;
+import org.venompvp.staff.commands.StaffModeCommand;
+import org.venompvp.staff.enums.Messages;
+import org.venompvp.staff.listeners.EntityListener;
+import org.venompvp.staff.objs.StaffPlayer;
+import org.venompvp.venom.module.Module;
+import org.venompvp.venom.module.ModuleInfo;
+
+import java.util.*;
+
+@ModuleInfo(name = "Staff", author = "LilProteinShake", version = "1.0", description = "Administration features")
+public class Staff extends Module {
+
+    private static Staff instance;
+    private ArrayList<StaffPlayer> staffPlayers = new ArrayList<>();
+    private ArrayList<UUID> frozenPlayers = new ArrayList<>();
+    private ItemStack randomPlayerItemStack, freezePlayerItemStack, vanishItemStack;
+
+    public static Staff getInstance() {
+        return instance;
+    }
+
+    @Override
+    public void onEnable() {
+        setupModule(this);
+        instance = this;
+
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+
+        Arrays.stream(Messages.values()).forEach(message -> {
+            if (getConfig().isSet("messages." + message.getKey())) {
+                message.setMessage(getConfig().getString("messages." + message.getKey()));
+            } else {
+                getConfig().set("messages." + message.getKey(), message.getValue());
+            }
+        });
+        saveConfig();
+
+        randomPlayerItemStack = getVenom().itemStackFromConfig(getConfig(), "staffmode.random-player-item");
+        freezePlayerItemStack = getVenom().itemStackFromConfig(getConfig(), "staffmode.freeze-player-item");
+        vanishItemStack = getVenom().itemStackFromConfig(getConfig(), "staffmode.vanish-item");
+
+        getCommandHandler().register(this, new FreezeCommand(this));
+        getCommandHandler().register(this, new StaffModeCommand(this));
+        getCommandHandler().register(this, new StaffChatCommand(this));
+        getCommandHandler().register(this, new ReportCommand(this));
+        getServer().getPluginManager().registerEvents(new EntityListener(), this);
+    }
+
+    @Override
+    public void onDisable() {
+        staffPlayers.stream().filter(StaffPlayer::isStaffMode).forEach(StaffPlayer::removeStaffMode);
+        frozenPlayers.stream().map(uuid -> getServer().getPlayer(uuid)).forEach(player -> player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType())));
+    }
+
+    public ArrayList<UUID> getFrozenPlayers() {
+        return frozenPlayers;
+    }
+
+    public void unfreeze(Player target) {
+        broadcast(Messages.BROADCAST_UNFROZEN, Collections.singletonMap("{player}", target.getName()), target);
+        target.sendMessage(Messages.YOU_ARE_UNFROZEN.toString());
+        getConfig().getStringList("frozen.potion-effects").stream().map(s -> s.split("#")).map(potionParameters -> PotionEffectType.getByName(potionParameters[0].toUpperCase())).forEach(target::removePotionEffect);
+        getFrozenPlayers().remove(target.getUniqueId());
+    }
+
+    public void freeze(Player target) {
+        target.closeInventory();
+        getFrozenPlayers().add(target.getUniqueId());
+        broadcast(Messages.BROADCAST_FROZEN, Collections.singletonMap("{player}", target.getName()), target);
+        target.sendMessage(Messages.YOU_ARE_FROZEN.toString());
+        if (getConfig().getBoolean("frozen.potion-effects-enabled")) {
+            getConfig().getStringList("frozen.potion-effects").stream().map(s -> s.split("#")).forEach(potionParameters -> {
+                PotionEffectType potionEffectType = PotionEffectType.getByName(potionParameters[0].toUpperCase());
+                if (potionEffectType == null) {
+                    throw new RuntimeException(potionParameters[0] + " is unable to be parsed as a PotionEffectType. Contact Lil Protein Shake");
+                } else if (!isInt(potionParameters[1])) {
+                    throw new NumberFormatException(potionParameters[1] + " is unable to parse as an Integer. Contact Lil Protein Shake");
+                } else {
+                    int amplifier = Integer.parseInt(potionParameters[1]);
+                    target.addPotionEffect(new PotionEffect(potionEffectType, Integer.MAX_VALUE, amplifier));
+                }
+            });
+        }
+    }
+
+    public void broadcast(Messages message, Map<String, String> placeholders, Player... blacklistedPlayers) {
+        for (Player player : getServer().getOnlinePlayers()) {
+            for (Player blacklisted : blacklistedPlayers) {
+                if (!player.getUniqueId().toString().equals(blacklisted.getUniqueId().toString())) {
+                    String s = message.toString();
+                    for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                        s = s.replace(entry.getKey(), entry.getValue());
+                    }
+                    player.sendMessage(s);
+                }
+            }
+        }
+    }
+
+    public boolean isInt(String s) {
+        try {
+            Integer.parseInt(s);
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    public Optional<StaffPlayer> getStaffPlayer(Player target) {
+        return staffPlayers.stream().filter(staffPlayer -> target.getUniqueId().toString().equals(staffPlayer.getPlayer().getUniqueId().toString())).findFirst();
+    }
+
+    public boolean isItem(ItemStack a, ItemStack b) {
+        return a != null && b != null && a.getType() == b.getType() &&
+                a.hasItemMeta() &&
+                b.hasItemMeta() &&
+                a.getItemMeta().getDisplayName().equals(ChatColor.translateAlternateColorCodes('&', b.getItemMeta().getDisplayName()));
+    }
+
+    public Optional<? extends Player> getRandomPlayer(String bypassPermission) {
+        return Bukkit.getOnlinePlayers().stream().filter(o -> !o.hasPermission(bypassPermission)).skip(getVenom().random.nextInt(Bukkit.getOnlinePlayers().size() - 1)).findFirst();
+    }
+
+    public ItemStack getRandomPlayerItemStack() {
+        return randomPlayerItemStack;
+    }
+
+    public ItemStack getFreezePlayerItemStack() {
+        return freezePlayerItemStack;
+    }
+
+    public ItemStack getVanishItemStack() {
+        return vanishItemStack;
+    }
+
+    public ArrayList<StaffPlayer> getStaffPlayers() {
+        return staffPlayers;
+    }
+
+}

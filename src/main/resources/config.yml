@@ -1,0 +1,32 @@
+staffmode:
+  random-player-item:
+    material: 'COMPASS'
+    name: '&eRandom Teleport'
+    lore:
+    - '&7Right click to teleport to a random player.'
+  freeze-player-item:
+    material: 'PACKED_ICE'
+    name: '&eFreeze'
+    lore:
+    - '&7Right click on a player to freeze them.'
+  vanish-item:
+    material: 'BARRIER'
+    name: '&cVanish'
+    lore:
+    - '&7Right click to toggle vanish.'
+frozen:
+  potion-effects-enabled: true
+  potion-effects:
+  - 'SLOW_DIGGING#5'
+  - 'BLINDNESS#1'
+report-message:
+- ''
+- '&e{player} reported &c"{message}"'
+- ''
+logged-while-frozen:
+  commands:
+  - 'ban {player} 30d Logging out while frozen'
+  broadcast:
+    enabled: true
+    message:
+    - '&c{player} has logged out in combat!'
