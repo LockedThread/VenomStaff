@@ -166,7 +166,7 @@ public class EntityListener implements Listener {
         } else if (event.getItem() != null) {
             Optional<StaffPlayer> staffPlayerOptional = INSTANCE.getStaffPlayer(player);
             if (staffPlayerOptional.isPresent()) {
-                if (INSTANCE.isItem(event.getItem(), INSTANCE.getRandomPlayerItemStack())) {
+                if (Utils.isItem(event.getItem(), INSTANCE.getRandomPlayerItemStack())) {
                     final Optional<? extends Player> randomPlayer = INSTANCE.getRandomPlayer("staff.");
                     if (randomPlayer.isPresent()) {
                         player.teleport(randomPlayer.get());
