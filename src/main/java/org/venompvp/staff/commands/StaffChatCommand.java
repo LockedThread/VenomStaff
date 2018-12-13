@@ -29,7 +29,7 @@ public class StaffChatCommand extends Command implements ParentCommand {
 
     @Override
     public String getUsage(String label) {
-        return null;
+        return "/" + label;
     }
 
     @Override
