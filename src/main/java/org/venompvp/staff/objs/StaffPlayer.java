@@ -21,6 +21,8 @@ public class StaffPlayer {
         this.vanish = false;
         this.staffChat = false;
         this.staffMode = false;
+        this.previousLocation = null;
+        this.cachedInventory = null;
     }
 
     public void addStaffMode() {
@@ -54,7 +56,7 @@ public class StaffPlayer {
     public void toggleVanish() {
         vanish = !vanish;
         if (vanish) {
-            Bukkit.getOnlinePlayers().stream().filter(player -> !player.getUniqueId().toString().equals(getPlayer().getUniqueId().toString())).forEach(player -> player.hidePlayer(getPlayer()));
+            Bukkit.getOnlinePlayers().stream().filter(player -> !player.getUniqueId().toString().equals(uuid.toString())).forEach(player -> player.hidePlayer(getPlayer()));
         } else {
             Bukkit.getOnlinePlayers().forEach(player -> player.showPlayer(getPlayer()));
         }

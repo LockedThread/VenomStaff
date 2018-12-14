@@ -4,6 +4,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.venompvp.staff.Staff;
 import org.venompvp.staff.enums.Messages;
+import org.venompvp.staff.objs.StaffPlayer;
 import org.venompvp.venom.commands.Command;
 import org.venompvp.venom.commands.ParentCommand;
 import org.venompvp.venom.commands.arguments.Argument;
@@ -21,10 +22,11 @@ public class StaffChatCommand extends Command implements ParentCommand {
     @Override
     public void execute(CommandSender sender, List<Argument> args, String label) {
         Player player = (Player) sender;
-        Staff.getInstance().getStaffPlayer(player).ifPresent(staffPlayer -> {
+        StaffPlayer staffPlayer = Staff.getInstance().getStaffPlayer(player);
+        if (staffPlayer != null) {
             staffPlayer.setStaffChat(!staffPlayer.isStaffChat());
             sender.sendMessage(staffPlayer.isStaffChat() ? Messages.STAFFCHAT_ENABLE.toString() : Messages.STAFFCHAT_DISABLE.toString());
-        });
+        }
     }
 
     @Override

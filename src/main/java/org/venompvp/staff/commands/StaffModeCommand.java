@@ -11,7 +11,6 @@ import org.venompvp.venom.module.Module;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 public class StaffModeCommand extends Command implements ParentCommand {
 
@@ -21,12 +20,11 @@ public class StaffModeCommand extends Command implements ParentCommand {
 
     @Override
     public void execute(CommandSender sender, List<Argument> args, String label) {
-        Optional<StaffPlayer> staffPlayerOptional = Staff.getInstance().getStaffPlayer((Player) sender);
-        if (staffPlayerOptional.isPresent()) {
-            StaffPlayer staffPlayer = staffPlayerOptional.get();
-            if (staffPlayer.isStaffMode())
+        StaffPlayer staffPlayer = Staff.getInstance().getStaffPlayer((Player) sender);
+        if (staffPlayer != null) {
+            if (staffPlayer.isStaffMode()) {
                 staffPlayer.removeStaffMode();
-            else {
+            } else {
                 staffPlayer.addStaffMode();
             }
         }

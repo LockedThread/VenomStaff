@@ -22,7 +22,7 @@ import java.util.*;
 public class Staff extends Module {
 
     private static Staff instance;
-    private ArrayList<StaffPlayer> staffPlayers = new ArrayList<>();
+    private HashMap<UUID, StaffPlayer> staffPlayers = new HashMap<>();
     private ArrayList<UUID> frozenPlayers = new ArrayList<>();
     private ItemStack randomPlayerItemStack, freezePlayerItemStack, vanishItemStack;
 
@@ -60,7 +60,7 @@ public class Staff extends Module {
 
     @Override
     public void onDisable() {
-        staffPlayers.stream().filter(StaffPlayer::isStaffMode).forEach(StaffPlayer::removeStaffMode);
+        staffPlayers.values().stream().filter(StaffPlayer::isStaffMode).forEach(StaffPlayer::removeStaffMode);
         frozenPlayers.stream().map(uuid -> getServer().getPlayer(uuid)).forEach(player -> player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType())));
     }
 
@@ -105,8 +105,8 @@ public class Staff extends Module {
         }));
     }
 
-    public Optional<StaffPlayer> getStaffPlayer(Player target) {
-        return staffPlayers.stream().filter(staffPlayer -> target.getUniqueId().toString().equals(staffPlayer.getPlayer().getUniqueId().toString())).findFirst();
+    public StaffPlayer getStaffPlayer(Player target) {
+        return staffPlayers.getOrDefault(target.getUniqueId(), null);
     }
 
     public Optional<? extends Player> getRandomPlayer(String bypassPermission) {
@@ -125,8 +125,7 @@ public class Staff extends Module {
         return vanishItemStack;
     }
 
-    public ArrayList<StaffPlayer> getStaffPlayers() {
+    public HashMap<UUID, StaffPlayer> getStaffPlayers() {
         return staffPlayers;
     }
-
 }
