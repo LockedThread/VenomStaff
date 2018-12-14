@@ -1,4 +1,4 @@
-package org.venompvp.staff;
+package org.venompvp.staff.objs;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
