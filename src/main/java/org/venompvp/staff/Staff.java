@@ -1,7 +1,6 @@
 package org.venompvp.staff;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -15,6 +14,7 @@ import org.venompvp.staff.listeners.EntityListener;
 import org.venompvp.staff.objs.StaffPlayer;
 import org.venompvp.venom.module.Module;
 import org.venompvp.venom.module.ModuleInfo;
+import org.venompvp.venom.utils.Utils;
 
 import java.util.*;
 
@@ -85,7 +85,7 @@ public class Staff extends Module {
                 PotionEffectType potionEffectType = PotionEffectType.getByName(potionParameters[0].toUpperCase());
                 if (potionEffectType == null) {
                     throw new RuntimeException(potionParameters[0] + " is unable to be parsed as a PotionEffectType. Contact Lil Protein Shake");
-                } else if (!isInt(potionParameters[1])) {
+                } else if (!Utils.isInt(potionParameters[1])) {
                     throw new NumberFormatException(potionParameters[1] + " is unable to parse as an Integer. Contact Lil Protein Shake");
                 } else {
                     int amplifier = Integer.parseInt(potionParameters[1]);
@@ -95,38 +95,18 @@ public class Staff extends Module {
         }
     }
 
-    public void broadcast(Messages message, Map<String, String> placeholders, Player... blacklistedPlayers) {
-        for (Player player : getServer().getOnlinePlayers()) {
-            for (Player blacklisted : blacklistedPlayers) {
-                if (!player.getUniqueId().toString().equals(blacklisted.getUniqueId().toString())) {
-                    String s = message.toString();
-                    for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-                        s = s.replace(entry.getKey(), entry.getValue());
-                    }
-                    player.sendMessage(s);
-                }
+    private void broadcast(Messages message, Map<String, String> placeholders, Player... blacklistedPlayers) {
+        getServer().getOnlinePlayers().forEach(player -> Arrays.stream(blacklistedPlayers).filter(player1 -> !player.getUniqueId().toString().equals(player1.getUniqueId().toString())).forEach((player1) -> {
+            String s = message.toString();
+            for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                s = s.replace(entry.getKey(), entry.getValue());
             }
-        }
-    }
-
-    public boolean isInt(String s) {
-        try {
-            Integer.parseInt(s);
-        } catch (NumberFormatException ex) {
-            return false;
-        }
-        return true;
+            player.sendMessage(s);
+        }));
     }
 
     public Optional<StaffPlayer> getStaffPlayer(Player target) {
         return staffPlayers.stream().filter(staffPlayer -> target.getUniqueId().toString().equals(staffPlayer.getPlayer().getUniqueId().toString())).findFirst();
-    }
-
-    public boolean isItem(ItemStack a, ItemStack b) {
-        return a != null && b != null && a.getType() == b.getType() &&
-                a.hasItemMeta() &&
-                b.hasItemMeta() &&
-                a.getItemMeta().getDisplayName().equals(ChatColor.translateAlternateColorCodes('&', b.getItemMeta().getDisplayName()));
     }
 
     public Optional<? extends Player> getRandomPlayer(String bypassPermission) {
