@@ -20,8 +20,6 @@ import org.venompvp.venom.utils.Utils;
 
 import java.util.Optional;
 
-;
-
 public class EntityListener implements Listener {
 
     private static final Staff INSTANCE = Staff.getInstance();
@@ -29,8 +27,8 @@ public class EntityListener implements Listener {
     @EventHandler
     public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        Optional<StaffPlayer> staffPlayer = INSTANCE.getStaffPlayer(player);
-        if (!event.isCancelled() && staffPlayer.isPresent() && staffPlayer.get().isStaffChat()) {
+        StaffPlayer staffPlayer = INSTANCE.getStaffPlayer(player);
+        if (!event.isCancelled() && staffPlayer != null && staffPlayer.isStaffChat()) {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', Messages.STAFFCHAT_FORMAT.toString().replace("{player}", player.getDisplayName()).replace("{message}", event.getMessage())));
             event.setCancelled(true);
         }
@@ -57,12 +55,13 @@ public class EntityListener implements Listener {
                         .forEach(s -> INSTANCE.getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', s.replace("{player}", player.getName()))));
             }
         } else if (event.getPlayer().hasPermission("venom.staff")) {
-            INSTANCE.getStaffPlayer(player).ifPresent(staffPlayer -> {
+            StaffPlayer staffPlayer = INSTANCE.getStaffPlayer(player);
+            if (staffPlayer != null) {
                 staffPlayer.setVanish(false);
                 staffPlayer.setStaffChat(false);
                 staffPlayer.removeStaffMode();
-                INSTANCE.getStaffPlayers().remove(staffPlayer);
-            });
+                INSTANCE.getStaffPlayers().remove(staffPlayer.getUuid());
+            }
         }
     }
 
@@ -76,8 +75,8 @@ public class EntityListener implements Listener {
     }
 
     private boolean fuckMeDaddy(Player player) {
-        Optional<StaffPlayer> staffPlayer = INSTANCE.getStaffPlayer(player);
-        return staffPlayer.isPresent() && staffPlayer.get().isStaffMode();
+        StaffPlayer staffPlayer = INSTANCE.getStaffPlayer(player);
+        return staffPlayer != null && staffPlayer.isStaffMode();
     }
 
     @EventHandler
@@ -164,20 +163,19 @@ public class EntityListener implements Listener {
         if (fuckMeInTheAss(player)) {
             event.setCancelled(true);
         } else if (event.getItem() != null) {
-            Optional<StaffPlayer> staffPlayerOptional = INSTANCE.getStaffPlayer(player);
-            if (staffPlayerOptional.isPresent()) {
+            StaffPlayer staffPlayer = INSTANCE.getStaffPlayer(player);
+            if (staffPlayer != null) {
                 if (Utils.isItem(event.getItem(), INSTANCE.getRandomPlayerItemStack())) {
-                    final Optional<? extends Player> randomPlayer = INSTANCE.getRandomPlayer("staff.");
+                    final Optional<? extends Player> randomPlayer = INSTANCE.getRandomPlayer("venom.staff");
                     if (randomPlayer.isPresent()) {
                         player.teleport(randomPlayer.get());
                         player.sendMessage(Messages.RANDOM_TELEPORT.toString().replace("{player}", randomPlayer.get().getName()));
                     } else {
                         player.sendMessage(Messages.RANDOM_TELEPORT_ERROR.toString());
                     }
-                } else if (INSTANCE.isItem(event.getItem(), INSTANCE.getVanishItemStack())) {
-                    staffPlayerOptional.get().toggleVanish();
+                } else if (Utils.isItem(event.getItem(), INSTANCE.getVanishItemStack())) {
+                    staffPlayer.toggleVanish();
                 }
-                event.setCancelled(true);
             }
         }
     }
@@ -188,9 +186,8 @@ public class EntityListener implements Listener {
         ItemStack itemStack = player.getItemInHand();
         if (event.getRightClicked() != null &&
                 event.getRightClicked() instanceof Player &&
-                itemStack != null &&
-                INSTANCE.isItem(itemStack, INSTANCE.getFreezePlayerItemStack()) &&
-                INSTANCE.getStaffPlayer(player).isPresent()) {
+                Utils.isItem(itemStack, INSTANCE.getFreezePlayerItemStack()) &&
+                INSTANCE.getStaffPlayer(player) != null) {
             final Player clicked = (Player) event.getRightClicked();
             if (INSTANCE.getFrozenPlayers().contains(event.getRightClicked().getUniqueId())) {
                 INSTANCE.unfreeze(clicked);
@@ -223,7 +220,7 @@ public class EntityListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (player.hasPermission("venom.staff")) {
-            INSTANCE.getStaffPlayers().add(new StaffPlayer(event.getPlayer().getUniqueId()));
+            INSTANCE.getStaffPlayers().put(player.getUniqueId(), new StaffPlayer(player.getUniqueId()));
         }
     }
 }
