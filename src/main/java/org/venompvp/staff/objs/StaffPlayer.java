@@ -5,7 +5,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.venompvp.staff.CachedInventory;
 import org.venompvp.staff.Staff;
 
 import java.util.UUID;
@@ -31,6 +30,7 @@ public class StaffPlayer {
             this.vanish = true;
             this.staffMode = true;
             getPlayer().getInventory().clear();
+            getPlayer().updateInventory();
             getPlayer().setGameMode(GameMode.CREATIVE);
             getPlayer().getInventory().setItem(0, Staff.getInstance().getVanishItemStack());
             getPlayer().getInventory().setItem(1, Staff.getInstance().getFreezePlayerItemStack());
