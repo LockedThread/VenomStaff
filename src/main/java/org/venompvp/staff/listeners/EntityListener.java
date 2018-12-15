@@ -47,7 +47,7 @@ public class EntityListener implements Listener {
 
     @EventHandler
     public void onInventoryCreative(InventoryCreativeEvent event) {
-        if (event.getWhoClicked() instanceof Player && fuckMeDaddy((Player) event.getWhoClicked())) {
+        if (event.getWhoClicked() instanceof Player && checkStaffMode((Player) event.getWhoClicked())) {
             event.setCancelled(true);
         }
     }
@@ -75,7 +75,7 @@ public class EntityListener implements Listener {
         }
     }
 
-    private boolean fuckMeInTheAss(Player player) {
+    private boolean checkFrozen(Player player) {
         if (INSTANCE.getFrozenPlayers().contains(player.getUniqueId())) {
             player.sendMessage(Messages.YOU_ARE_FROZEN.toString());
             return true;
@@ -83,7 +83,7 @@ public class EntityListener implements Listener {
         return false;
     }
 
-    private boolean fuckMeDaddy(Player player) {
+    private boolean checkStaffMode(Player player) {
         StaffPlayer staffPlayer = INSTANCE.getStaffPlayer(player);
         return staffPlayer != null && staffPlayer.isStaffMode();
     }
@@ -91,7 +91,7 @@ public class EntityListener implements Listener {
     @EventHandler
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
-        if (fuckMeInTheAss(player)) {
+        if (checkFrozen(player)) {
             event.setCancelled(true);
         }
     }
@@ -99,9 +99,9 @@ public class EntityListener implements Listener {
     @EventHandler
     public void onPlayerExpChange(PlayerExpChangeEvent event) {
         Player player = event.getPlayer();
-        if (fuckMeInTheAss(player)) {
+        if (checkFrozen(player)) {
             event.setAmount(0);
-        } else if (fuckMeDaddy(player)) {
+        } else if (checkStaffMode(player)) {
             player.sendMessage(Messages.NO_PERMISSION.toString());
             event.setAmount(0);
         }
@@ -110,9 +110,9 @@ public class EntityListener implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
-        if (fuckMeInTheAss(player)) {
+        if (checkFrozen(player)) {
             event.setCancelled(true);
-        } else if (fuckMeDaddy(player)) {
+        } else if (checkStaffMode(player)) {
             player.sendMessage(Messages.NO_PERMISSION.toString());
             event.setCancelled(true);
         }
@@ -122,9 +122,9 @@ public class EntityListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getWhoClicked() instanceof Player) {
             Player player = (Player) event.getWhoClicked();
-            if (fuckMeInTheAss(player)) {
+            if (checkFrozen(player)) {
                 event.setCancelled(true);
-            } else if (fuckMeDaddy(player)) {
+            } else if (checkStaffMode(player)) {
                 player.sendMessage(Messages.NO_PERMISSION.toString());
                 event.setCancelled(true);
             }
@@ -134,9 +134,9 @@ public class EntityListener implements Listener {
     @EventHandler
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        if (fuckMeInTheAss(player)) {
+        if (checkFrozen(player)) {
             event.setCancelled(true);
-        } else if (fuckMeDaddy(player)) {
+        } else if (checkStaffMode(player)) {
             player.sendMessage(Messages.NO_PERMISSION.toString());
             event.setCancelled(true);
         }
@@ -145,9 +145,9 @@ public class EntityListener implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        if (fuckMeInTheAss(player)) {
+        if (checkFrozen(player)) {
             event.setCancelled(true);
-        } else if (fuckMeDaddy(player)) {
+        } else if (checkStaffMode(player)) {
             player.sendMessage(Messages.NO_PERMISSION.toString());
             event.setCancelled(true);
         }
@@ -157,9 +157,9 @@ public class EntityListener implements Listener {
     public void onInventoryOpen(InventoryOpenEvent event) {
         if (event.getPlayer() instanceof Player) {
             Player player = (Player) event.getPlayer();
-            if (fuckMeInTheAss(player)) {
+            if (checkFrozen(player)) {
                 event.setCancelled(true);
-            } else if (fuckMeDaddy(player) && event.isCancelled()) {
+            } else if (checkStaffMode(player) && event.isCancelled()) {
                 player.sendMessage(Messages.NO_PERMISSION.toString());
                 event.setCancelled(true);
             }
@@ -169,7 +169,7 @@ public class EntityListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (fuckMeInTheAss(player)) {
+        if (checkFrozen(player)) {
             event.setCancelled(true);
         } else if (event.getItem() != null) {
             StaffPlayer staffPlayer = INSTANCE.getStaffPlayer(player);
@@ -210,7 +210,7 @@ public class EntityListener implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity damager = event.getDamager();
         Entity entity = event.getEntity();
-        if (entity instanceof Player && (INSTANCE.getFrozenPlayers().contains(entity.getUniqueId()) || fuckMeDaddy((Player) entity)) || damager instanceof Player && (INSTANCE.getFrozenPlayers().contains(damager.getUniqueId()) || fuckMeDaddy((Player) damager))) {
+        if (entity instanceof Player && (INSTANCE.getFrozenPlayers().contains(entity.getUniqueId()) || checkStaffMode((Player) entity)) || damager instanceof Player && (INSTANCE.getFrozenPlayers().contains(damager.getUniqueId()) || checkStaffMode((Player) damager))) {
             event.setCancelled(true);
         }
     }
@@ -218,7 +218,7 @@ public class EntityListener implements Listener {
     @EventHandler
     public void onEntityDamageEvent(EntityDamageEvent event) {
         Entity entity = event.getEntity();
-        if (entity instanceof Player && (INSTANCE.getFrozenPlayers().contains(entity.getUniqueId()) || fuckMeDaddy((Player) entity))) {
+        if (entity instanceof Player && (INSTANCE.getFrozenPlayers().contains(entity.getUniqueId()) || checkStaffMode((Player) entity))) {
             event.setCancelled(true);
         }
     }
@@ -236,6 +236,13 @@ public class EntityListener implements Listener {
         StaffPlayer staffPlayer = INSTANCE.getStaffPlayer(event.getPlayer());
         if (staffPlayer != null && staffPlayer.isStaffMode()) {
             event.getPlayer().setGameMode(GameMode.CREATIVE);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+        if (checkFrozen(event.getPlayer()) || checkStaffMode(event.getPlayer())) {
+            event.setCancelled(true);
         }
     }
 }
