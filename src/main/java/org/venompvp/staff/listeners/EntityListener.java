@@ -1,6 +1,7 @@
 package org.venompvp.staff.listeners;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -64,7 +65,6 @@ public class EntityListener implements Listener {
             }
         }
     }
-
 
     private boolean fuckMeInTheAss(Player player) {
         if (INSTANCE.getFrozenPlayers().contains(player.getUniqueId())) {
@@ -221,6 +221,14 @@ public class EntityListener implements Listener {
         Player player = event.getPlayer();
         if (player.hasPermission("venom.staff")) {
             INSTANCE.getStaffPlayers().put(player.getUniqueId(), new StaffPlayer(player.getUniqueId()));
+        }
+    }
+
+    @EventHandler
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        StaffPlayer staffPlayer = INSTANCE.getStaffPlayer(event.getPlayer());
+        if (staffPlayer != null && staffPlayer.isStaffMode()) {
+            event.getPlayer().setGameMode(GameMode.CREATIVE);
         }
     }
 }
