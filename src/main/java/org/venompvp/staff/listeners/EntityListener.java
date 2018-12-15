@@ -1,5 +1,6 @@
 package org.venompvp.staff.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
@@ -11,6 +12,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
@@ -30,7 +32,7 @@ public class EntityListener implements Listener {
         Player player = event.getPlayer();
         StaffPlayer staffPlayer = INSTANCE.getStaffPlayer(player);
         if (!event.isCancelled() && staffPlayer != null && staffPlayer.isStaffChat()) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', Messages.STAFFCHAT_FORMAT.toString().replace("{player}", player.getDisplayName()).replace("{message}", event.getMessage())));
+            Bukkit.getOnlinePlayers().stream().filter(p -> p.hasPermission("venom.staff")).forEach(p -> p.sendMessage(ChatColor.translateAlternateColorCodes('&', Messages.STAFFCHAT_FORMAT.toString().replace("{player}", player.getDisplayName()).replace("{message}", event.getMessage()))));
             event.setCancelled(true);
         }
     }
@@ -40,6 +42,13 @@ public class EntityListener implements Listener {
         if (!Utils.compareLocations(event.getFrom(), event.getTo()) && INSTANCE.getFrozenPlayers().contains(event.getPlayer().getUniqueId())) {
             event.setTo(event.getFrom());
             event.getPlayer().sendMessage(Messages.YOU_ARE_FROZEN.toString());
+        }
+    }
+
+    @EventHandler
+    public void onInventoryCreative(InventoryCreativeEvent event) {
+        if (event.getWhoClicked() instanceof Player && fuckMeDaddy((Player) event.getWhoClicked())) {
+            event.setCancelled(true);
         }
     }
 
