@@ -201,9 +201,7 @@ public class EntityListener implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity damager = event.getDamager();
         Entity entity = event.getEntity();
-        if (entity instanceof Player && (INSTANCE.getFrozenPlayers().contains(entity.getUniqueId()) || fuckMeDaddy((Player) entity))) {
-            event.setCancelled(true);
-        } else if (damager instanceof Player && (INSTANCE.getFrozenPlayers().contains(damager.getUniqueId()) || fuckMeDaddy((Player) damager))) {
+        if (entity instanceof Player && (INSTANCE.getFrozenPlayers().contains(entity.getUniqueId()) || fuckMeDaddy((Player) entity)) || damager instanceof Player && (INSTANCE.getFrozenPlayers().contains(damager.getUniqueId()) || fuckMeDaddy((Player) damager))) {
             event.setCancelled(true);
         }
     }
