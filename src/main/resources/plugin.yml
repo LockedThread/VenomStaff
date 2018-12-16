@@ -1,0 +1,4 @@
+name: VenomStaff
+main: org.venompvp.staff.Staff
+version: 1.0
+depend: [Venom]
