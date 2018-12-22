@@ -1,6 +1,5 @@
 package org.venompvp.staff.listeners;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
@@ -32,7 +31,7 @@ public class EntityListener implements Listener {
         Player player = event.getPlayer();
         StaffPlayer staffPlayer = INSTANCE.getStaffPlayer(player);
         if (!event.isCancelled() && staffPlayer != null && staffPlayer.isStaffChat()) {
-            Bukkit.getOnlinePlayers().stream().filter(p -> p.hasPermission("venom.staff")).forEach(p -> p.sendMessage(ChatColor.translateAlternateColorCodes('&', Messages.STAFFCHAT_FORMAT.toString().replace("{player}", player.getDisplayName()).replace("{message}", event.getMessage()))));
+            INSTANCE.getStaffPlayers().forEach((key, value) -> value.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', Messages.STAFFCHAT_FORMAT.toString().replace("{player}", player.getDisplayName()).replace("{message}", event.getMessage()))));
             event.setCancelled(true);
         }
     }
