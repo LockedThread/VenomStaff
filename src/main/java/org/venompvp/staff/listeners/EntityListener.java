@@ -181,7 +181,7 @@ public class EntityListener implements Listener {
                     } else {
                         player.sendMessage(Messages.RANDOM_TELEPORT_ERROR.toString());
                     }
-                } else if (Utils.isItem(event.getItem(), INSTANCE.getVanishItemStack())) {
+                } else if (Utils.isItem(event.getItem(), INSTANCE.getVanishOnItemStack()) || Utils.isItem(event.getItem(), INSTANCE.getVanishOffItemStack())) {
                     staffPlayer.toggleVanish();
                 }
             }

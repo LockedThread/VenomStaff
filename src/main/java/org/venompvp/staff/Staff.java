@@ -24,7 +24,7 @@ public class Staff extends Module {
     private static Staff instance;
     private HashMap<UUID, StaffPlayer> staffPlayers = new HashMap<>();
     private ArrayList<UUID> frozenPlayers = new ArrayList<>();
-    private ItemStack randomPlayerItemStack, freezePlayerItemStack, vanishItemStack;
+    private ItemStack randomPlayerItemStack, freezePlayerItemStack, vanishOnItemStack, vanishOffItemStack;
 
     public static Staff getInstance() {
         return instance;
@@ -47,9 +47,10 @@ public class Staff extends Module {
         });
         saveConfig();
 
-        randomPlayerItemStack = getVenom().itemStackFromConfig(getConfig(), "staffmode.random-player-item");
-        freezePlayerItemStack = getVenom().itemStackFromConfig(getConfig(), "staffmode.freeze-player-item");
-        vanishItemStack = getVenom().itemStackFromConfig(getConfig(), "staffmode.vanish-item");
+        randomPlayerItemStack = Utils.configSectionToItemStack(getConfig(), "staffmode.random-player-item");
+        freezePlayerItemStack = Utils.configSectionToItemStack(getConfig(), "staffmode.freeze-player-item");
+        vanishOnItemStack = Utils.configSectionToItemStack(getConfig(), "staffmode.vanish-on-item");
+        vanishOffItemStack = Utils.configSectionToItemStack(getConfig(), "staffmode.vanish-off-item");
 
         getCommandHandler().register(this, new FreezeCommand(this));
         getCommandHandler().register(this, new StaffModeCommand(this));
@@ -123,8 +124,12 @@ public class Staff extends Module {
         return freezePlayerItemStack;
     }
 
-    public ItemStack getVanishItemStack() {
-        return vanishItemStack;
+    public ItemStack getVanishOnItemStack() {
+        return vanishOnItemStack;
+    }
+
+    public ItemStack getVanishOffItemStack() {
+        return vanishOffItemStack;
     }
 
     public HashMap<UUID, StaffPlayer> getStaffPlayers() {

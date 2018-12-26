@@ -31,10 +31,11 @@ public class StaffPlayer {
             this.previousLocation = getPlayer().getLocation();
             this.vanish = true;
             this.staffMode = true;
+            Bukkit.getOnlinePlayers().stream().filter(player -> !player.getUniqueId().toString().equals(uuid.toString())).forEach(player -> player.hidePlayer(getPlayer()));
             getPlayer().getInventory().clear();
             getPlayer().updateInventory();
             getPlayer().setGameMode(GameMode.CREATIVE);
-            getPlayer().getInventory().setItem(0, Staff.getInstance().getVanishItemStack());
+            getPlayer().getInventory().setItem(0, Staff.getInstance().getVanishOffItemStack());
             getPlayer().getInventory().setItem(1, Staff.getInstance().getFreezePlayerItemStack());
             getPlayer().getInventory().setItem(2, Staff.getInstance().getRandomPlayerItemStack());
         }
@@ -49,6 +50,7 @@ public class StaffPlayer {
             this.cachedInventory = null;
             this.previousLocation = null;
             this.vanish = false;
+            Bukkit.getOnlinePlayers().forEach(player -> player.showPlayer(getPlayer()));
             this.staffMode = false;
         }
     }
@@ -56,8 +58,10 @@ public class StaffPlayer {
     public void toggleVanish() {
         vanish = !vanish;
         if (vanish) {
+            getPlayer().getInventory().setItem(0, Staff.getInstance().getVanishOffItemStack());
             Bukkit.getOnlinePlayers().stream().filter(player -> !player.getUniqueId().toString().equals(uuid.toString())).forEach(player -> player.hidePlayer(getPlayer()));
         } else {
+            getPlayer().getInventory().setItem(0, Staff.getInstance().getVanishOnItemStack());
             Bukkit.getOnlinePlayers().forEach(player -> player.showPlayer(getPlayer()));
         }
     }

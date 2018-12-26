@@ -4,16 +4,41 @@ staffmode:
     name: '&eRandom Teleport'
     lore:
     - '&7Right click to teleport to a random player.'
+    enchanted: false
+    glasspane:
+      enabled: false
+      color: 'RED'
   freeze-player-item:
     material: 'PACKED_ICE'
     name: '&eFreeze'
     lore:
     - '&7Right click on a player to freeze them.'
-  vanish-item:
-    material: 'BARRIER'
+    enchanted: false
+    glasspane:
+      enabled: false
+      color: 'RED'
+  vanish-off-item:
+    material: 'INK_SACK'
     name: '&cVanish'
     lore:
     - '&7Right click to toggle vanish.'
+    - '&aLime to toggle off'
+    - '&7Gray to toggle on'
+    enchanted: false
+    glasspane:
+      enabled: true
+      color: 'GRAY'
+  vanish-on-item:
+    material: 'INK_SACK'
+    name: '&cVanish'
+    lore:
+    - '&7Right click to toggle vanish.'
+    - '&aLime to toggle off'
+    - '&7Gray to toggle on'
+    enchanted: false
+    glasspane:
+      enabled: true
+      color: 'LIME'
 frozen:
   potion-effects-enabled: true
   potion-effects:
