@@ -63,7 +63,7 @@ public class Staff extends Module {
     public void onDisable() {
         staffPlayers.values().stream().filter(StaffPlayer::isStaffMode).forEach(StaffPlayer::removeStaffMode);
         frozenPlayers.stream().map(uuid -> getServer().getPlayer(uuid)).forEach(player -> player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType())));
-        disableCommands();
+        disableCommands(this);
         instance = null;
     }
 
