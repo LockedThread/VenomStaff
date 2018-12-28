@@ -18,7 +18,7 @@ import org.venompvp.venom.utils.Utils;
 
 import java.util.*;
 
-@ModuleInfo(name = "Staff", author = "LilProteinShake", version = "1.0", description = "Administration features")
+@ModuleInfo(name = "Staff", author = "Simpleness", version = "1.0", description = "Administration features")
 public class Staff extends Module {
 
     private static Staff instance;
