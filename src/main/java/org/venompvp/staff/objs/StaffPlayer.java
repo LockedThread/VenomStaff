@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.venompvp.staff.Staff;
+import org.venompvp.venom.objs.CachedInventory;
 
 import java.util.UUID;
 
@@ -27,7 +28,7 @@ public class StaffPlayer {
 
     public void addStaffMode() {
         if (!staffMode) {
-            this.cachedInventory = new CachedInventory(getPlayer().getInventory().getContents(), getPlayer().getInventory().getArmorContents());
+            this.cachedInventory = new CachedInventory(getPlayer());
             this.previousLocation = getPlayer().getLocation();
             this.vanish = true;
             this.staffMode = true;
